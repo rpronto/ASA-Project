@@ -5,7 +5,7 @@ using namespace std;
 int chapa(int X, int Y, int x[], int y[], int v[], int i) {
 
     if (X == 0 || Y == 0 || i < 0) {
-        std::cout << "Based\n";
+        std::cout << "Base\n";
         return 0;
     }
 
