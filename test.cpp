@@ -23,10 +23,14 @@ int chapa(int X, int Y, int x[], int y[], int v[], int i) {
 }
 
 int main() {
-    int x[2] = {6, 1};
-    int y[2] = {3, 2};
-    int v[2] = {130, 5};
-    int res = chapa(7, 4, x, y, v, 1);
+    int x, y, n;
+    cin >> x >> y;
+    cin >> n;
+    int piece_x[n], piece_y[n], v[n];
+    for(int i = 0; i < n; i++)
+        cin >> piece_x[i] >> piece_y[i] >> v[i];
+
+    int res = chapa(x, y, piece_x, piece_y, v, n);
     std::cout << "" << res;
     return 0;
 }
