@@ -4,22 +4,35 @@ using namespace std;
 
 int chapa(int X, int Y, int x[], int y[], int v[], int i) {
 
-    if (X == 0 || Y == 0 || i < 0) {
-        std::cout << "Base\n";
+    if (X < 1 || Y < 1 || i < 0) {
         return 0;
     }
 
-    if (x[i] > X || y[i] > Y) {
-        std::cout << X << " " << Y << "\n";
-        std::cout << x[i] << " " << y[i] << "\n";
-        std::cout << "Second\n";
+    else if ((x[i] > X || y[i] > Y) && (y[i] > X || x[i] > Y)) {
+        cout << X << " " << Y << "\n";
         return chapa(X, Y, x, y, v, i-1);
     }
 
-    else {std::cout << X << " " << Y << "\n"; std::cout << x[i] << " " << y[i] << "\n"; std::cout << "Normal\n";
+    else if (y[i] <= X && x[i] <= Y) {
+        cout << X << " " << Y << "\n";
+        return chapa(Y, X, x, y, v, i);
+    }
+
+    else if (X >= x[i]){
+        cout << X << " " << Y << "\n";
         return max(
-        chapa(X, Y, x, y, v, i-1), chapa(X-x[i], Y-y[i], x, y, v, i)
-    ) + v[i];}
+            chapa(X, Y, x, y, v, i-1), v[i] + chapa(X - x[i], Y, x, y, v, i) + 
+            chapa(x[i], y[i], x, y, v, i) + chapa(x[i], Y-y[i], x, y, v, i)
+        );
+    }
+
+    else{
+        cout << X << " " << Y << "\n";
+        return max(
+            chapa(X, Y, x, y, v, i-1), v[i] + chapa(X, Y- y[i], x, y, v, i) + 
+            chapa(x[i], y[i], x, y, v, i) + chapa(X - x[i], Y, x, y, v, i)
+        );
+    }
 }
 
 int main() {
