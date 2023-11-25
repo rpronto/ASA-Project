@@ -14,24 +14,24 @@ int  cut (int X, int Y, vector<int>& piece_x, vector<int>& piece_y, vector<int>&
     for (int x = 1; x <= X; x++) {
         for(int y = 1; y <= Y; y++ ) {
             for(int i = 1; i <= n; i++) {
-                if(piece_x[i] <= x && piece_y[i] <= y) {
-                    k[x][y][i] =  max(k[x][y][i-1],
-                    v[i] + k[x - piece_x[i]][y][i] + k[piece_x[i]][piece_y[i]][i] + 
-                    k[piece_x[i]][y - piece_y[i]][i]);
-                } else if(piece_y[i] <= y) {
-                    k[x][y][i] =  max(k[x][y][i-1],
-                    v[i] + k[x][y - piece_y[i]][i] + k[piece_x[i]][piece_y[i]][i] + 
-                    k[x - piece_x[i]][piece_y[i]][i]);
-                } else if((piece_y[i] <= x) && (piece_x[i] <= y)) {
-                    k[x][y][i] = max({k[x][y][i-1],
-                    v[i] + k[x - piece_y[i]][y][i] + k[piece_y[i]][piece_x[i]][i] + 
-                    k[piece_y[i]][y - piece_x[i]][i],
-                    v[i] + k[x][y - piece_x[i]][i] + k[piece_y[i]][piece_x[i]][i] + 
-                    k[x - piece_y[i]][piece_x[i]][i]
-                    });
-                } else {
+                if(((piece_x[i] > x) || (piece_y[i] > y)) && ((piece_x[i] > y) || (piece_y[i] > x))){
                     k[x][y][i] = k[x][y][i-1];
-                }
+                } else if((piece_x[i] <= x) && (piece_y[i] <= y)) {
+                    int temp1 =  max(k[x][y][i-1],
+                    v[i] + k[x - piece_x[i]][y][i] + k[piece_x[i]][y - piece_y[i]][i]);
+                    int temp2 =  max(k[x][y][i-1],
+                    v[i] + k[x][y - piece_y[i]][i] +  k[x - piece_x[i]][piece_y[i]][i]);
+                    k[x][y][i] = max(temp1,temp2);
+                } else if((piece_y[i] <= x) && (piece_x[i] <= y)) {
+                    int aux = piece_x[i];
+                    piece_x[i] = piece_y[i];
+                    piece_y[i] = aux;
+                    int temp1 =  max(k[x][y][i-1],
+                    v[i] + k[x - piece_x[i]][y][i] + k[piece_x[i]][y - piece_y[i]][i]);
+                    int temp2 =  max(k[x][y][i-1],
+                    v[i] + k[x][y - piece_y[i]][i] +  k[x - piece_x[i]][piece_y[i]][i]);
+                    k[x][y][i] = max(temp1,temp2);
+                } 
             }
         }
     }
