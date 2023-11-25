@@ -11,28 +11,26 @@ using namespace std;
 int  cut (int X, int Y, vector<int>& piece_x, vector<int>& piece_y, vector<int>& v, int n) {
     
     vector<vector<vector<int>>> k(X+1, vector<vector<int>>(Y+1, vector<int>(n+1, 0)));
-    if((X <= 0) || (Y <= 0) || (n <= 0))
-        return 0;
     for (int x = 1; x <= X; x++) {
         for(int y = 1; y <= Y; y++ ) {
             for(int i = 1; i <= n; i++) {
-                if(piece_x[i] <= x) {
-                    k[x][y][i] =  max(cut(X, Y, piece_x, piece_y, v, n - 1),
-                    v[i] + cut(X - piece_x[i], Y, piece_x, piece_y, v, n) + cut(piece_x[i], piece_y[i], piece_x, piece_y, v, n) + 
-                    cut(piece_x[i], Y - piece_y[i], piece_x, piece_y, v, n));
+                if(piece_x[i] <= x && piece_y[i] <= y) {
+                    k[x][y][i] =  max(k[x][y][i-1],
+                    v[i] + k[x - piece_x[i]][y][i] + k[piece_x[i]][piece_y[i]][i] + 
+                    k[piece_x[i]][y - piece_y[i]][i]);
                 } else if(piece_y[i] <= y) {
-                    k[x][y][i] =  max(cut(X, Y, piece_x, piece_y, v, n - 1),
-                    v[i] + cut(X, Y - piece_y[i], piece_x, piece_y, v, n) + cut(piece_x[i], piece_y[i], piece_x, piece_y, v, n) + 
-                    cut(X - piece_x[i], piece_y[i], piece_x, piece_y, v, n));
+                    k[x][y][i] =  max(k[x][y][i-1],
+                    v[i] + k[x][y - piece_y[i]][i] + k[piece_x[i]][piece_y[i]][i] + 
+                    k[x - piece_x[i]][piece_y[i]][i]);
                 } else if((piece_y[i] <= x) && (piece_x[i] <= y)) {
-                    k[x][y][i] = max({cut(X, Y, piece_x, piece_y, v, n - 1),
-                    v[i] + cut(X - piece_y[i], Y, piece_x, piece_y, v, n) + cut(piece_y[i], piece_x[i], piece_x, piece_y, v, n) + 
-                    cut(piece_y[i], Y - piece_x[i], piece_x, piece_y, v, n),
-                    v[i] + cut(X, Y - piece_x[i], piece_x, piece_y, v, n) + cut(piece_y[i], piece_x[i], piece_x, piece_y, v, n) + 
-                    cut(X - piece_y[i], piece_x[i], piece_x, piece_y, v, n)
+                    k[x][y][i] = max({k[x][y][i-1],
+                    v[i] + k[x - piece_y[i]][y][i] + k[piece_y[i]][piece_x[i]][i] + 
+                    k[piece_y[i]][y - piece_x[i]][i],
+                    v[i] + k[x][y - piece_x[i]][i] + k[piece_y[i]][piece_x[i]][i] + 
+                    k[x - piece_y[i]][piece_x[i]][i]
                     });
                 } else {
-                    k[x][y][i] = cut(X, Y, piece_x, piece_y, v, n - 1);
+                    k[x][y][i] = k[x][y][i-1];
                 }
             }
         }
