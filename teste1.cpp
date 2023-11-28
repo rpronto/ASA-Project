@@ -12,7 +12,6 @@ struct Piece {
     int v;
 };
 
-
 int  cut (int X, int Y, vector<Piece>& pieces, int n) {
     vector<vector<int>> k(X+1, vector<int>(Y+1, 0));
     
@@ -20,8 +19,8 @@ int  cut (int X, int Y, vector<Piece>& pieces, int n) {
         for(int x = 1; x <= X; x++) {
             for(int y = 1; y <= Y; y++) {
                 if(((pieces[i].x > x) || (pieces[i].y > y)) && ((pieces[i].x > y) || (pieces[i].y > x))){
-                        k[x][y] = k[x][y];
-                        continue;
+                    k[x][y] = k[x][y];
+                    continue;
                 }
                 if(((pieces[i].x <= x) && (pieces[i].y <= y)) || ((pieces[i].x <= y) && (pieces[i].y <= x))) {
                     int normal = 0;
@@ -61,22 +60,17 @@ int main() {
     int x, y, n;
     cin >> x >> y;
     cin >> n;
-
     vector<Piece> pieces(n+1);
     
     pieces[0].x = 0;
     pieces[0].y = 0;
     pieces[0].v = 0;
     
-
     for (int i = 1; i <= n; i++)
         cin >> pieces[i].x >> pieces[i].y >> pieces[i].v;
- 
     // Ordenação com base em x e depois em y
     sort(pieces.begin(), pieces.end(), comparePieces);
-
     int res = cut(x, y, pieces, n);
     cout << res << endl;
-
     return 0;
 }
