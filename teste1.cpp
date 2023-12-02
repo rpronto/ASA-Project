@@ -3,6 +3,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -15,35 +16,24 @@ struct Piece {
 int  cut (int X, int Y, vector<Piece>& pieces, int n) {
     vector<vector<int>> k(X+1, vector<int>(Y+1, 0));
     
-    for(int i = 1; i <= n; i++){
-        for(int x = 1; x <= X; x++) {
-            for(int y = 1; y <= Y; y++) {
-                if(((pieces[i].x > x) || (pieces[i].y > y)) && ((pieces[i].x > y) || (pieces[i].y > x))){
-                    k[x][y] = k[x][y];
-                    continue;
-                }
-                if(((pieces[i].x <= x) && (pieces[i].y <= y)) || ((pieces[i].x <= y) && (pieces[i].y <= x))) {
-                    int normal = 0;
-                    int flip = 0;
-                    if((pieces[i].x <= x) && (pieces[i].y <= y)) {
-                        int temp1 =  max(k[x][y],
-                        pieces[i].v + k[x - pieces[i].x][y] + k[pieces[i].x][y - pieces[i].y]);
-                        int temp2 =  max(k[x][y],
-                        pieces[i].v + k[x][y - pieces[i].y] +  k[x - pieces[i].x][pieces[i].y]);
-                        normal = max(temp1,temp2);
-                    } if((pieces[i].y <= x) && (pieces[i].x <= y)) {
-                        int aux = pieces[i].x;
-                        pieces[i].x = pieces[i].y;
-                        pieces[i].y = aux;
-                        int temp1 =  max(k[x][y],
-                        pieces[i].v + k[x - pieces[i].x][y] + k[pieces[i].x][y - pieces[i].y]);
-                        int temp2 =  max(k[x][y],
-                        pieces[i].v + k[x][y - pieces[i].y] +  k[x - pieces[i].x][pieces[i].y]);
-                        flip = max(temp1,temp2);
-                    } 
-                    k[x][y] = max(normal, flip);
-                }
+    int i = 1;
+    for(int x = 1; x <= X; x++) {
+        for(int y = x; y <= Y; y++) {
+            int val = 0, max_x = 0, max_y = 0;
+            if (i <= n && ((pieces[i].x == x) && (pieces[i].y == y)) || ((pieces[i].x == y) && (pieces[i].y == x))) {
+                  val = pieces[i].v;
+                  i++;
             }
+            for (int cut_x = 1; cut_x <= ceil(x/2); cut_x++) {
+                int aux = k[cut_x][y] + k[x - cut_x][y];
+                max_x = max(max_x, aux);
+            }
+            for (int cut_y = 1; cut_y <= ceil(y/2); cut_y++) {
+                int aux = k[x][cut_y] + k[x][y - cut_y];
+                max_y = max(max_y, aux);
+            }
+            k[x][y] = max({val, max_x, max_y});
+            if (y <= X) {k[y][x] = k[x][y];}
         }
     }
     return k[X][Y];
@@ -70,6 +60,11 @@ int main() {
         cin >> pieces[i].x >> pieces[i].y >> pieces[i].v;
     // Ordenação com base em x e depois em y
     sort(pieces.begin(), pieces.end(), comparePieces);
+    if (x > y) {
+        int aux = x;
+        x = y;
+        y = aux;
+    }
     int res = cut(x, y, pieces, n);
     cout << res << endl;
     return 0;
