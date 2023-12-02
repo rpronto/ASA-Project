@@ -18,9 +18,11 @@ int  cut (int X, int Y, vector<Piece>& pieces, int n) {
     
     int i = 1;
     for(int x = 1; x <= X; x++) {
+        if (x < pieces[1].x && x < pieces[1].y) continue;
         for(int y = x; y <= Y; y++) {
+            if (y < pieces[1].x && y < pieces[1].y) continue;
             int val = 0, max_x = 0, max_y = 0;
-            if ((i <= n) && (((pieces[i].x == x) && (pieces[i].y == y)) || ((pieces[i].x == y) && (pieces[i].y == x)))) {
+            while ((i <= n) && (((pieces[i].x == x) && (pieces[i].y == y)) || ((pieces[i].x == y) && (pieces[i].y == x)))) {
                   val = pieces[i].v;
                   i++;
             }
@@ -41,6 +43,9 @@ int  cut (int X, int Y, vector<Piece>& pieces, int n) {
 
 bool comparePieces(const Piece &a, const Piece &b) {
     if(a.x == b.x) {
+        if (a.y == b.y) {
+            return a.v < b.v;
+        }
         return a.y < b.y;
     }
     return a.x < b.x;
