@@ -20,7 +20,7 @@ int  cut (int X, int Y, vector<Piece>& pieces, int n) {
     for(int x = 1; x <= X; x++) {
         for(int y = x; y <= Y; y++) {
             int val = 0, max_x = 0, max_y = 0;
-            if (i <= n && ((pieces[i].x == x) && (pieces[i].y == y)) || ((pieces[i].x == y) && (pieces[i].y == x))) {
+            if ((i <= n) && (((pieces[i].x == x) && (pieces[i].y == y)) || ((pieces[i].x == y) && (pieces[i].y == x)))) {
                   val = pieces[i].v;
                   i++;
             }
