@@ -58,6 +58,19 @@ int main() {
     
     for (int i = 1; i <= n; i++)
         cin >> pieces[i].x >> pieces[i].y >> pieces[i].v;
+    
+    /*pieces.erase(
+    remove_if(pieces.begin() + 1, pieces.end(), [&](const Piece& p) {
+        return (p.x == pieces[0].x && p.y == pieces[0].y) || (p.x == p.y && p.v < pieces[0].v);
+    }),
+    pieces.end()
+    );*/
+
+    for (int i = 1; i <= n; i++) {
+        if (pieces[i].x > pieces[i].y) {
+            swap(pieces[i].x, pieces[i].y);
+        }
+    }
     // Ordenação com base em x e depois em y
     sort(pieces.begin(), pieces.end(), comparePieces);
     if (x > y) {
