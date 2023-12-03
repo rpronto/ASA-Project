@@ -1,4 +1,4 @@
-//Project1
+//Project1 - al014 , ist1106819 , ist1105672
 
 #include <iostream>
 #include <vector>
@@ -63,7 +63,6 @@ int main() {
         }
     }
 
-    // Ordenação com base em x e depois em y
     sort(pieces.begin(), pieces.end(), comparePieces);
     if (x > y) {
         swap(x,y);
