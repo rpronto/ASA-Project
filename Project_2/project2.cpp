@@ -9,10 +9,14 @@ using namespace std;
 struct Vertice {
     int color; // 0 - Branco , 1 - Cinzento, 2 - Preto
     int value;
+    int tempoInicio;
+    int tempoFim;
     list<Vertice> verticesAdjacentes;
 };
 
-
+void DFS(vector<Vertice> grafo) {
+    
+}
 
 
 
@@ -25,10 +29,10 @@ int main() {
     int n, m, x ,y;
     cin >> n >> m;
 
-    vector<Vertice> listAdj(n+1);
+    vector<Vertice> grafo(n+1);  //grafo representado por uma lista de adjacencias
 
     for(int i = 1; i <=n ; i++) 
-        listAdj[i].value = i;
+        grafo[i].value = i;
     
     for(int i = 0; i < m; i++) {
         cin >> x >> y;
@@ -37,7 +41,7 @@ int main() {
         verticeY.value = y;
         verticeY.color = 0;
         
-        listAdj[x].verticesAdjacentes.push_back(verticeY);
+        grafo[x].verticesAdjacentes.push_back(verticeY);
     }
 
     return 0;
