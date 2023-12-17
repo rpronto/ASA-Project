@@ -82,7 +82,7 @@ void getGrafoT(vector<Vertice> &grafo, vector<Vertice> &grafoT) {
 
 int getResult(vector<Vertice> &grafoT, vector<int> &ordemTop) {
     int first = ordemTop[0];
-    int res = 0;
+    int maior_max_r = 0;
     for(Vertice vertice : grafoT) 
         vertice.r = 0;
     
@@ -100,11 +100,12 @@ int getResult(vector<Vertice> &grafoT, vector<int> &ordemTop) {
             }
         }
         grafoT[ordemTop[i]].r = max_r;
-        if(max_r != 0)
-            res = grafoT[ordemTop[i]].valor; 
+        if(max_r > maior_max_r)
+            maior_max_r = max_r;
+        
     }
     
-    return grafoT[res].r;  
+    return maior_max_r;  
 }
 
 bool compareFinalTime(const Vertice &v1, const Vertice &v2) {
