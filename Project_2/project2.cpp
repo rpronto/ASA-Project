@@ -14,7 +14,7 @@ struct Vertice {
     int tempoInicio;
     int tempoFim;
     int r; // numero de saltos maximo ate ao primeiro elemento de ordem topologica inversa
-    list<Vertice> verticesAdjacentes;
+    list<int> verticesAdjacentes;
 };
 
 int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo) {
@@ -24,9 +24,9 @@ int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo) {
     tempo ++;
     grafo[vertice.valor].tempoInicio = tempo;
     while(!pilha.empty()) {
-        for(Vertice verticeAdj: pilha.top().verticesAdjacentes) {
-            if(grafo[verticeAdj.valor].cor == 0) 
-                pilha.push(grafo[verticeAdj.valor]);
+        for(int verticeAdj: pilha.top().verticesAdjacentes) {
+            if(grafo[verticeAdj].cor == 0) 
+                pilha.push(grafo[verticeAdj]);
         }
         if(grafo[pilha.top().valor].cor == 0) {
             grafo[pilha.top().valor].cor = 1;
@@ -57,10 +57,10 @@ void DFS(vector<Vertice> &grafo) {
 void getGrafoT(vector<Vertice> &grafo, vector<Vertice> &grafoT) {
     for(Vertice vertice : grafo) {
         grafoT[vertice.valor].valor = vertice.valor;
-        for(Vertice verticeAdj : vertice.verticesAdjacentes) {
+        for(int verticeAdj : vertice.verticesAdjacentes) {
             Vertice verticeT;
             verticeT.valor = vertice.valor;
-            grafoT[verticeAdj.valor].verticesAdjacentes.push_back(verticeT);
+            grafoT[verticeAdj].verticesAdjacentes.push_back(verticeT.valor);
         }
     }
 }
@@ -73,11 +73,11 @@ int getResult(vector<Vertice> &grafoT, vector<Vertice> &ordemTop) {
     ordemTop.pop_back(); //retira o ultimo elemento que sera o de indice 0
     for(Vertice vertice : ordemTop) {
         int max_r = 0;
-        for(Vertice verticeAdj : grafoT[vertice.valor].verticesAdjacentes) {
-            if((verticeAdj.valor == first) && (max_r < 1)) 
+        for(int verticeAdj : grafoT[vertice.valor].verticesAdjacentes) {
+            if((verticeAdj == first) && (max_r < 1)) 
                 max_r = 1;
-            if(grafoT[verticeAdj.valor].r >= max_r)
-                max_r = grafoT[verticeAdj.valor].r + 1;  
+            if(grafoT[verticeAdj].r >= max_r)
+                max_r = grafoT[verticeAdj].r + 1;  
         }
         grafoT[vertice.valor].r = max_r;
         if(max_r != 0)
@@ -110,10 +110,7 @@ int main() {
     
     for(int i = 0; i < m; i++) {
         cin >> x >> y;
-        Vertice verticeY;
-        verticeY.valor = y;
-        verticeY.cor = 0;
-        grafo[x].verticesAdjacentes.push_back(verticeY);
+        grafo[x].verticesAdjacentes.push_back(y);
     }
 
     DFS(grafo);
