@@ -15,10 +15,10 @@ struct Vertice {
     int tempoFim;
     int r; // numero de saltos maximo ate ao primeiro elemento de ordem topologica inversa
     int SCCFlag;
-    list<Vertice> verticesAdjacentes;
+    vector<int> verticesAdjacentes;
 };
 
-int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo) {
+int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo, int SCCFlag) {
     stack<Vertice> pilha;
     pilha.push(vertice);
     grafo[vertice.valor].cor = 1;
@@ -26,9 +26,9 @@ int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo) {
     grafo[vertice.valor].tempoInicio = tempo;
     
     while(!pilha.empty()) {
-        for(Vertice verticeAdj: pilha.top().verticesAdjacentes) {
-            if(grafo[verticeAdj.valor].cor == 0) 
-                pilha.push(grafo[verticeAdj.valor]);
+        for(int verticeAdj: pilha.top().verticesAdjacentes) {
+            if(grafo[verticeAdj].cor == 0) 
+                pilha.push(grafo[verticeAdj]);
         }
         if(grafo[pilha.top().valor].cor == 0) {
             grafo[pilha.top().valor].cor = 1;
@@ -40,6 +40,7 @@ int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo) {
             grafo[pilha.top().valor].cor = 2;
             tempo++;
             grafo[pilha.top().valor].tempoFim = tempo;
+            grafo[pilha.top().valor].SCCFlag = SCCFlag;
             pilha.pop();
             continue;
         }
@@ -49,11 +50,16 @@ int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo) {
     return tempo;
 }
 
-void DFS(vector<Vertice> &grafo) {
+void DFS(vector<Vertice> &grafo, vector<int> ordem, int DFSNumber) {
     int tempo = 0;
-    for(Vertice vertice: grafo) {
-        if(vertice.cor == 0)
-            tempo = DFS_Visit(grafo, vertice, tempo);
+    int SCCFlag = 0;
+    for(size_t i = 0; i < grafo.size(); i++) {
+        if(grafo[ordem[i]].cor == 0) {
+            if(DFSNumber == 2)
+                SCCFlag++;
+            tempo = DFS_Visit(grafo, grafo[ordem[i]], tempo, SCCFlag);
+        }
+
     }
 }
 
@@ -64,52 +70,49 @@ void getGrafoT(vector<Vertice> &grafo, vector<Vertice> &grafoT) {
         grafoT[vertice.valor].tempoFim = vertice.tempoFim;
         grafoT[vertice.valor].r = vertice.r;
         grafoT[vertice.valor].SCCFlag = 0;
-        for(Vertice verticeAdj : vertice.verticesAdjacentes) {
-            Vertice verticeT;
-            verticeT.valor = vertice.valor;
-            grafoT[verticeAdj.valor].verticesAdjacentes.push_back(verticeT);
+        if(vertice.valor == 0)
+            grafoT[vertice.valor].cor = -1;
+        for(int verticeAdj : vertice.verticesAdjacentes) {
+            int verticeT;
+            verticeT = vertice.valor;
+            grafoT[verticeAdj].verticesAdjacentes.push_back(verticeT);
         }
     }
 }
 
-int getResult(vector<Vertice> &grafoT, vector<Vertice> &ordemTop) {
-    int first = ordemTop[0].valor;
+int getResult(vector<Vertice> &grafoT, vector<int> &ordemTop) {
+    int first = ordemTop[0];
     int res = 0;
     for(Vertice vertice : grafoT) 
         vertice.r = 0;
-    ordemTop.pop_back(); //retira o ultimo elemento que sera o de indice 0
-    for(Vertice vertice : ordemTop) {
+    
+    for(size_t i = 0; i < ordemTop.size(); i++) {
         int max_r = 0;
-        for(Vertice verticeAdj : grafoT[vertice.valor].verticesAdjacentes) {
-            if((verticeAdj.valor == first) && (max_r < 1)) 
+        for(int verticeAdj : grafoT[ordemTop[i]].verticesAdjacentes) {
+            if((verticeAdj == first) && (max_r < 1)) 
                 max_r = 1;
-            if(grafoT[verticeAdj.valor].r >= max_r)
-                max_r = grafoT[verticeAdj.valor].r + 1;  
+            if(grafoT[verticeAdj].r > max_r){
+                if((grafoT[verticeAdj].SCCFlag == grafoT[ordemTop[i]].SCCFlag)) {
+                    max_r = grafoT[verticeAdj].r;
+                } else {
+                    max_r = grafoT[verticeAdj].r + 1;  
+                }
+            }
         }
-        grafoT[vertice.valor].r = max_r;
+        grafoT[ordemTop[i]].r = max_r;
         if(max_r != 0)
-            res = vertice.valor; 
+            res = grafoT[ordemTop[i]].valor; 
     }
     
     return grafoT[res].r;  
 }
 
-/*
-void reiniciaValores(vector<Vertice> &grafo) {
-    for(size_t i = 0; i < grafo.size(); i++) {
-        grafo[i].cor = 0;
-        grafo[i].tempoFim = 0;
-        grafo[i].tempoInicio = 0;
-        grafo[i].r = 0;
-        grafo[i].SCCFlag = 0;
-        if(grafo[i].verticesAdjacentes.size() == 0)
-            grafo[i].verticesAdjacentes.clear();
-    }
-}*/
-
-
 bool compareFinalTime(const Vertice &v1, const Vertice &v2) {
     return v1.tempoFim > v2.tempoFim;
+}
+
+bool compareValor(const Vertice &v1, const Vertice &v2) {
+    return v1.valor < v2.valor;
 }
 
 int main() {
@@ -131,82 +134,28 @@ int main() {
     
     for(int i = 0; i < m; i++) {
         cin >> x >> y;
-        Vertice verticeY;
-        verticeY.valor = y;
-        grafo[x].verticesAdjacentes.push_back(verticeY);
+        grafo[x].verticesAdjacentes.push_back(y);
     }
 
-    DFS(grafo);
-    
-
+    vector<int> ordemCrescente(n+1);
+    for(int i = 0; i <= n; i++){ 
+        ordemCrescente[i] = i;
+        
+    }
+    DFS(grafo, ordemCrescente, 1);
+       
     vector<Vertice> grafoTrans(n+1); 
     getGrafoT(grafo, grafoTrans);
     sort(grafoTrans.begin(), grafoTrans.end(), compareFinalTime);
-    grafoTrans.pop_back();
-    /*DFS(grafoTrans);*/
-    
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    cout << "\n";
-    cout << "\n";
-    for(Vertice vertice:grafoTrans) {
-        cout << vertice.valor << " i: " << vertice.tempoInicio << " f: " << vertice.tempoFim << " cor: " << vertice.cor << " r: " << vertice.r << " SCCFlag: " << vertice.SCCFlag << " Adj -> ";
-        for(Vertice verticeAdj:vertice.verticesAdjacentes) {
-            cout << verticeAdj.valor << " ";
-        }
-        cout << "\n";
+    vector<int> ordemTopInv(n+1);
+    for(int i = 0; i <= n; i++) {
+        ordemTopInv[i] = grafoTrans[i].valor;   
     }
-    cout << "\n";
-    cout << "\n";
-
-
-
+    ordemTopInv.pop_back(); //retira o ultimo elemento que sera o de indice 0
+    sort(grafoTrans.begin(), grafoTrans.end(), compareValor);
+    DFS(grafoTrans, ordemTopInv, 2);
     
-    
-    
-    
-    
-    /*
-    cout << "\n" << grafoTrans[0].r << "\n" << grafoTrans[1].r << "\n" << grafoTrans[6].r;
-    for(Vertice vertice:grafoTrans) {
-        cout << vertice.valor << " " << vertice.tempoFim << " ";
-        for(Vertice verticeAdj:vertice.verticesAdjacentes) {
-            cout << verticeAdj.valor << " ";
-        }
-        cout << "\n";
-    }
-
-
-
-    for(Vertice vertice:grafo) {
-        cout << vertice.valor << " i: " << vertice.tempoInicio << " f: " << vertice.tempoFim << " cor: " << vertice.cor << " r: " << vertice.r << " Adj -> ";
-        for(Vertice verticeAdj:vertice.verticesAdjacentes) {
-            cout << verticeAdj.valor << " ";
-        }
-        cout << "\n";
-    }
-
-    
-    cout << "\n";
-    cout << "\n";
-    for(Vertice vertice:grafoTrans) {
-        cout << vertice.valor << " i: " << vertice.tempoInicio << " f: " << vertice.tempoFim << " cor: " << vertice.cor << " r: " << vertice.r << " SCCFlag: " << vertice.SCCFlag << " Adj -> ";
-        for(Vertice verticeAdj:vertice.verticesAdjacentes) {
-            cout << verticeAdj.valor << " ";
-        }
-        cout << "\n";
-    }
-    cout << "\n";
-    cout << "\n";
-    }*/
+    cout << getResult(grafoTrans, ordemTopInv) << "\n";
 
     return 0;
 }
