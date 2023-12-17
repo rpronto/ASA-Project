@@ -91,7 +91,7 @@ int getResult(vector<Vertice> &grafoT, vector<int> &ordemTop) {
         for(int verticeAdj : grafoT[ordemTop[i]].verticesAdjacentes) {
             if((verticeAdj == first) && (max_r < 1)) 
                 max_r = 1;
-            if(grafoT[verticeAdj].r > max_r){
+            if(grafoT[verticeAdj].r >= max_r){
                 if((grafoT[verticeAdj].SCCFlag == grafoT[ordemTop[i]].SCCFlag)) {
                     max_r = grafoT[verticeAdj].r;
                 } else {
