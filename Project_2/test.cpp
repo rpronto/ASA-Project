@@ -21,11 +21,12 @@ struct Vertice {
 int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo, int SCCFlag) {
     stack<Vertice> pilha;
     pilha.push(vertice);
-    grafo[vertice.valor].cor = 1;
-    tempo ++;
-    grafo[vertice.valor].tempoInicio = tempo;
-    
     while(!pilha.empty()) {
+        if(grafo[pilha.top().valor].cor == 0) {
+            grafo[pilha.top().valor].cor = 1;
+            tempo++;
+            grafo[pilha.top().valor].tempoInicio = tempo;  
+        }
         for(int verticeAdj: pilha.top().verticesAdjacentes) {
             if(grafo[verticeAdj].cor == 0) 
                 pilha.push(grafo[verticeAdj]);
@@ -34,7 +35,7 @@ int DFS_Visit(vector<Vertice> &grafo, Vertice vertice, int tempo, int SCCFlag) {
             grafo[pilha.top().valor].cor = 1;
             tempo++;
             grafo[pilha.top().valor].tempoInicio = tempo;
-            continue;
+            continue;  
         }
         if(grafo[pilha.top().valor].cor == 1) {
             grafo[pilha.top().valor].cor = 2;
@@ -59,7 +60,6 @@ void DFS(vector<Vertice> &grafo, vector<int> ordem, int DFSNumber) {
                 SCCFlag++;
             tempo = DFS_Visit(grafo, grafo[ordem[i]], tempo, SCCFlag);
         }
-
     }
 }
 
@@ -85,26 +85,30 @@ int getResult(vector<Vertice> &grafoT, vector<int> &ordemTop) {
     int maior_max_r = 0;
     for(Vertice vertice : grafoT) 
         vertice.r = 0;
-    
+    int pendentValue = 0;
+    int SCCValue = 0;
     for(size_t i = 0; i < ordemTop.size(); i++) {
         int max_r = 0;
         for(int verticeAdj : grafoT[ordemTop[i]].verticesAdjacentes) {
-            if((verticeAdj == first) && (max_r < 1)) 
+            if(grafoT[verticeAdj].SCCFlag == grafoT[ordemTop[i]].SCCFlag)
+                SCCValue = grafoT[ordemTop[i]].SCCFlag;
+            if((grafoT[verticeAdj].SCCFlag == SCCValue) && (grafoT[verticeAdj].r < pendentValue))
+                grafoT[verticeAdj].r = pendentValue;
+            if((verticeAdj == first) && (max_r < 1) && (grafoT[ordemTop[i]].SCCFlag != grafoT[first].SCCFlag)) 
                 max_r = 1;
             if(grafoT[verticeAdj].r >= max_r){
-                if((grafoT[verticeAdj].SCCFlag == grafoT[ordemTop[i]].SCCFlag)) {
+                if(grafoT[verticeAdj].SCCFlag == grafoT[ordemTop[i]].SCCFlag) 
                     max_r = grafoT[verticeAdj].r;
-                } else {
+                else 
                     max_r = grafoT[verticeAdj].r + 1;  
-                }
             }
         }
         grafoT[ordemTop[i]].r = max_r;
+        if(SCCValue == grafoT[ordemTop[i]].SCCFlag)
+            pendentValue = max_r;
         if(max_r > maior_max_r)
-            maior_max_r = max_r;
-        
+            maior_max_r = max_r;   
     }
-    
     return maior_max_r;  
 }
 
@@ -122,6 +126,11 @@ int main() {
     
     int n, m, x ,y;
     cin >> n >> m;
+
+    if ( (n == 0) || (m == 0)) {
+        cout << 0 << "\n";
+        return 0;
+    }
 
     vector<Vertice> grafo(n+1);  //grafo representado por uma lista de adjacencias
     grafo[0].cor = -1;
@@ -145,18 +154,20 @@ int main() {
     }
     DFS(grafo, ordemCrescente, 1);
        
+
     vector<Vertice> grafoTrans(n+1); 
     getGrafoT(grafo, grafoTrans);
     sort(grafoTrans.begin(), grafoTrans.end(), compareFinalTime);
     vector<int> ordemTopInv(n+1);
-    for(int i = 0; i <= n; i++) {
-        ordemTopInv[i] = grafoTrans[i].valor;   
-    }
+    for(int i = 0; i <= n; i++) 
+        ordemTopInv[i] = grafoTrans[i].valor;
+         
     ordemTopInv.pop_back(); //retira o ultimo elemento que sera o de indice 0
     sort(grafoTrans.begin(), grafoTrans.end(), compareValor);
     DFS(grafoTrans, ordemTopInv, 2);
-    
+
     cout << getResult(grafoTrans, ordemTopInv) << "\n";
+
 
     return 0;
 }
