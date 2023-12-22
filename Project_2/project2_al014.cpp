@@ -54,7 +54,7 @@ int DFS_Visit(vector<Vertice> &graph, Vertice vertice, int time, int sccFlag) {
 void DFS(vector<Vertice> &graph, vector<int> order, int dfsFlag) {
     int time = 0;
     int sccFlag = 0;
-    for(size_t i = 0; i < graph.size(); i++) {
+    for(size_t i = 0; i < order.size(); i++) {
         if(graph[order[i]].color == 0) {
             if(dfsFlag == 2)
                 sccFlag++;
@@ -144,7 +144,6 @@ int main() {
         graph[i].endTime = 0;
         graph[i].maxJ = 0;
     }
-
     for(int i = 0; i < m; i++) {
         cin >> x >> y;
         graph[x].adjVertices.push_back(y);
