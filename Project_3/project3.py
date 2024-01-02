@@ -17,3 +17,5 @@ packages = []
 for n in range(p):
     i, j, k, l = input().split()
     packages += [[int(i),int(j),int(k),int(l)]]
+
+prob = LpProblem("ToysProblem", LpMaximize)
