@@ -1,56 +1,44 @@
 # Project3 - al014 , ist1106819 , ist1105672
 from pulp import *
 
-t, p, max = input().split()
+t, p, max = map(int, sys.stdin.readline().split())
 
-t = int(t)
-p = int(p)
-max = int(max)
-
-toys = []
 lucro_t = {}
 capacidade_t = {}
 toys_p = {}
 
 for n in range(t):
-    l, c = input().split()
-    toys += [n]
-    lucro_t[n] = int(l)
-    capacidade_t[n] = int(c)
+    l, c = map(int, sys.stdin.readline().split())
+    lucro_t[n] = l
+    capacidade_t[n] = c
     toys_p[n] = []
-    
 
-packages = []
 lucro_p = {}
 
 for n in range(p):
-    i, j, k, l = input().split()
-    packages += [n]
-    lucro_p[n] = int(l)
-    toys_p[int(i)-1] += [n]
-    toys_p[int(j)-1] += [n]
-    toys_p[int(k)-1] += [n]
+    i, j, k, l = map(int, sys.stdin.readline().split())
+    lucro_p[n] = l
+    toys_p[i-1] += [n]
+    toys_p[j-1] += [n]
+    toys_p[k-1] += [n]
 
-prob = LpProblem("toys", LpMaximize)
+prob = LpProblem("MaxProfitToys", LpMaximize)
 
-vars_t = LpVariable.dict("toys", toys, 0, max, LpInteger)
-vars_p = LpVariable.dict("packages", packages, 0, max, LpInteger)
+vars_t = LpVariable.dict("toys", list(range(t)), 0, max, LpInteger)
+vars_p = LpVariable.dict("packages", list(range(p)), 0, max, LpInteger)
 
 prob += (
-    lpSum([vars_t[i] * lucro_t[i] for i in toys])
-    + lpSum([vars_p[i] * lucro_p[i] for i in packages])
+    lpSum([vars_t[i] * lucro_t[i] for i in range(t)])
+    + lpSum([vars_p[i] * lucro_p[i] for i in range(p)])
 )
 
 
 prob += (  
-    (lpSum([vars_t[i] for i in toys]) 
-    + lpSum(3*[vars_p[n] for n in packages])) <= max
+    (lpSum([vars_t[i] for i in range(t)]) 
+    + 3*lpSum([vars_p[n] for n in range(p)])) <= max
 )
 
-for i in range (t):
-    if not toys_p[i]:
-        prob += vars_t[i] <= capacidade_t[i]
-        continue
+for i in range(t):
     prob += vars_t[i] + lpSum(vars_p[p] for p in toys_p[i]) <= capacidade_t[i]
 
 
