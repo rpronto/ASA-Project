@@ -38,25 +38,22 @@ vars_p = LpVariable.dict("packages", packages, 0, max, LpInteger)
 
 prob += (
     lpSum([vars_t[i] * lucro_t[i] for i in toys])
-    + lpSum([vars_p[i] * lucro_p[i] for i in packages]),
-    "objectivo"
+    + lpSum([vars_p[i] * lucro_p[i] for i in packages])
 )
 
 
 prob += (  
     (lpSum([vars_t[i] for i in toys]) 
-    + (lpSum(vars_p[n] for n in toys_p[i]) for i in toys)) <= max,
-    "capacidade"
+    + lpSum(3*[vars_p[n] for n in packages])) <= max
 )
 
 for i in range (t):
-    prob += vars_t[i] <= capacidade_t[i]
+    if not toys_p[i]:
+        prob += vars_t[i] <= capacidade_t[i]
+        continue
+    prob += vars_t[i] + lpSum(vars_p[p] for p in toys_p[i]) <= capacidade_t[i]
 
-for i in range (t):
-    for p in toys_p[i]:
-        prob += vars_t[i] + vars_p[p] <= capacidade_t[i]
 
-
-prob.solve()
+prob.solve(PULP_CBC_CMD(msg=0))
 
 print(int(value(prob.objective)))
