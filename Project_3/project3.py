@@ -3,21 +3,21 @@ from pulp import *
 
 t, p, max = map(int, sys.stdin.readline().split())
 
-lucro_t = {}
-capacidade_t = {}
+profit_t = {}
+capacity_t = {}
 toys_p = {}
 
 for n in range(t):
     l, c = map(int, sys.stdin.readline().split())
-    lucro_t[n] = l
-    capacidade_t[n] = c
+    profit_t[n] = l
+    capacity_t[n] = c
     toys_p[n] = []
     
-lucro_p = {}
+profit_p = {}
 
 for n in range(p):
     i, j, k, l = map(int, sys.stdin.readline().split())
-    lucro_p[n] = l
+    profit_p[n] = l
     toys_p[i-1] += [n]
     toys_p[j-1] += [n]
     toys_p[k-1] += [n]
@@ -29,8 +29,8 @@ vars_t = LpVariable.dict("toys", list(range(t)), 0, max, LpInteger)
 vars_p = LpVariable.dict("packages", list(range(p)), 0, max, LpInteger)
 
 prob += (
-    lpSum([vars_t[i] * lucro_t[i] for i in range(t)])
-    + lpSum([vars_p[i] * lucro_p[i] for i in range(p)])
+    lpSum([vars_t[i] * profit_t[i] for i in range(t)])
+    + lpSum([vars_p[i] * profit_p[i] for i in range(p)])
 )
 
 prob += (  
@@ -39,7 +39,7 @@ prob += (
 )
 
 for i in range(t):
-    prob += vars_t[i] + lpSum(vars_p[p] for p in toys_p[i]) <= capacidade_t[i]
+    prob += vars_t[i] + lpSum(vars_p[p] for p in toys_p[i]) <= capacity_t[i]
 
 prob.solve(PULP_CBC_CMD(msg=0, timeLimit=0.01))
 
